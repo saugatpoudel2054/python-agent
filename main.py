@@ -13,6 +13,7 @@ if len(sys.argv) < 2:
     exit(1)
 
 prompt = sys.argv[1]
+is_verbose = len(sys.argv) > 2 and sys.argv[2] == "--verbose"
 
 messages = [
     types.Content(
@@ -23,6 +24,9 @@ messages = [
 
 client = genai.Client(api_key=api_key)
 response = client.models.generate_content(model='gemini-2.0-flash-001', contents=messages)
+
 print(response.text)
-print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+if is_verbose:
+    print(f"User prompt: {prompt}")
+    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
