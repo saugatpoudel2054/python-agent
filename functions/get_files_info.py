@@ -1,4 +1,5 @@
 import os
+from config import MAX_CHARS
 
 def get_files_info(working_directory, directory="."):
     try:
@@ -24,3 +25,49 @@ def get_files_info(working_directory, directory="."):
 
 
     return '\n'.join(file_description_list)
+
+def get_file_content(working_directory, file_path):
+    try:
+        current_dir = os.path.abspath(os.path.join("."))
+        file_path_abs = os.path.abspath(os.path.join(current_dir, working_directory, file_path))
+
+        if not file_path_abs.startswith(current_dir):
+            return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+        
+        if not os.path.isfile(file_path_abs):
+            return f'Error: File not found or is not a regular file: "{file_path}"'
+
+        with open(file_path_abs, "r") as f:
+            file_content_string = f.read(MAX_CHARS)
+            if len(file_content_string) == MAX_CHARS:
+                file_content_string += f'[...File "{file_path}" truncated at 10000 characters]'
+    
+
+    except Exception as e:
+        return f'Error: {e}'
+
+    return file_content_string
+
+def write_file(working_directory, file_path, content):
+
+    try:
+        current_dir = os.path.abspath(os.path.join("."))
+        file_path_abs = os.path.abspath(os.path.join(current_dir, working_directory, file_path))
+
+        if not file_path_abs.startswith(current_dir):
+            return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
+        
+        if not os.path.exists(file_path_abs):
+            os.makedirs(os.path.dirname(file_path_abs), exist_ok=True)
+
+        with open(file_path_abs, "w") as f:
+            f.write(content)
+
+        return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
+
+    except Exception as e:
+        return f'Error: {e}'
+
+    
+    
+
