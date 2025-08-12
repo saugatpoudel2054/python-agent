@@ -28,8 +28,8 @@ def get_files_info(working_directory, directory="."):
 
 def get_file_content(working_directory, file_path):
     try:
-        current_dir = os.path.abspath(os.path.join("."))
-        file_path_abs = os.path.abspath(os.path.join(current_dir, working_directory, file_path))
+        current_dir = os.path.abspath(os.path.join(working_directory))
+        file_path_abs = os.path.abspath(os.path.join(working_directory, file_path))
 
         if not file_path_abs.startswith(current_dir):
             return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
@@ -51,8 +51,8 @@ def get_file_content(working_directory, file_path):
 def write_file(working_directory, file_path, content):
 
     try:
-        current_dir = os.path.abspath(os.path.join("."))
-        file_path_abs = os.path.abspath(os.path.join(current_dir, working_directory, file_path))
+        current_dir = os.path.abspath(os.path.join(working_directory))
+        file_path_abs = os.path.abspath(os.path.join(working_directory, file_path))
 
         if not file_path_abs.startswith(current_dir):
             return f'Error: Cannot write to "{file_path}" as it is outside the permitted working directory'
