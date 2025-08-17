@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 
 from config import system_prompt
+from functions.get_files_info import available_functions
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -29,11 +30,16 @@ response = client.models.generate_content(
     model='gemini-2.0-flash-001', 
     contents=messages,
     config=types.GenerateContentConfig(
+        tools=[available_functions],
         system_instruction=system_prompt
     ),
 )
 
-print(response.text)
+if response and response.function_calls:
+    for function_call_part in response.function_calls:
+        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+else:
+    print(response.text)
 if is_verbose:
     print(f"User prompt: {prompt}")
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
