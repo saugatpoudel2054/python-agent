@@ -19,11 +19,23 @@ def run_python_file(working_directory, file_path, args=[]):
         
         try:
             completed_process = subprocess.run(["python", file_path_abs] + args, timeout=30, capture_output=True, text=True)
+            
+            # Combine stdout and stderr for complete output
+            output = ""
+            if completed_process.stdout:
+                output += completed_process.stdout
+            if completed_process.stderr:
+                if output:
+                    output += "\n"
+                output += completed_process.stderr
+            
             if completed_process.returncode != 0:
-                return f"STDERR (Process exited with code {completed_process.returncode}): {completed_process.stderr}"
-            if completed_process.stdout == "":
+                return f"Process exited with code {completed_process.returncode}:\n{output}"
+            
+            if not output.strip():
                 return "No output produced"
-            return f"STDOUT: {completed_process.stdout}"
+            
+            return output
         except Exception as e:
             return f"Error: executing Python file: {e}"
 
@@ -43,7 +55,7 @@ schema_run_python_file = types.FunctionDeclaration(
             "args": types.Schema(
                 type=types.Type.ARRAY,
                 items=types.Schema(type=types.Type.STRING),
-                description="Additional arguments to pass to the Python file.",
+                description="Additional arguments to pass to the Python file. If there are no arguments run without the arguments.",
             ),
         },
     ),

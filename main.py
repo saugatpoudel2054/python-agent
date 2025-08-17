@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 
 from config import system_prompt
-from functions.get_files_info import available_functions
+from call_functions import call_function, available_functions
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -35,11 +35,25 @@ response = client.models.generate_content(
     ),
 )
 
+
 if response and response.function_calls:
     for function_call_part in response.function_calls:
-        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        result = call_function(function_call_part, verbose=is_verbose)
+        if not result:
+            raise Exception(f"Fatal Error: No result from calling function {function_call_part.name}")
+        
+        if (
+            not result.parts
+            or not result.parts[0].function_response
+        ):
+            raise Exception("empty function call result")
+
+        if is_verbose:
+            print(f"-> {result.parts[0].function_response.response}")
+
 else:
     print(response.text)
+
 if is_verbose:
     print(f"User prompt: {prompt}")
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
