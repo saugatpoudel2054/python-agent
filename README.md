@@ -1,0 +1,1 @@
+This is a basic claude code like agent that can look into the code in the current directory and make corrections as well as introduce fresh new bugs(feature)
